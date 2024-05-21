@@ -14,7 +14,7 @@ go get -u github.com/harnyk/tgvercel
 
 -   `TGVERCEL_KEY` - internal service key, used to set up the webhook.
     Put any random string here
--   `TGVERCEL_TOKEN` - Telegram bot token
+-   `TELEGRAM_TOKEN` - Telegram bot token
 
 2. Create the following files in your project:
 
