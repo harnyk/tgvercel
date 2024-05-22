@@ -15,6 +15,7 @@ go get -u github.com/harnyk/tgvercel
 -   `TGVERCEL_KEY` - internal service key, used to set up the webhook.
     Put any random string here
 -   `TELEGRAM_TOKEN` - Telegram bot token
+-   `TELEGRAM_WEBHOOK_SECRET` - Telegram bot webhook secret. It will be then sent by Telegram to authenticate the webhook. Put any random string here
 
 2. Create the following files in your project:
 
@@ -47,6 +48,7 @@ import (
     tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+// Put your bot logic here
 func OnUpdate(
 	bot *tgbotapi.BotAPI,
 	update *tgbotapi.Update) {

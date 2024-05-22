@@ -88,8 +88,22 @@ func (w *TgVercel) Bot() (*tgbotapi.BotAPI, error) {
 	return w.bot, nil
 }
 
-func (w *TgVercel) HandleWebhook(r *http.Request, onUpdate UpdateHandlerFunc) {
-	bot, err := w.Bot()
+func (t *TgVercel) HandleWebhook(r *http.Request, onUpdate UpdateHandlerFunc) {
+	o := t.options
+
+	webhookSecret := os.Getenv(o.TelegramWebhookSecretEnvName)
+	if webhookSecret == "" {
+		log.Fatal(fmt.Errorf("%s is not set", o.TelegramWebhookSecretEnvName))
+		return
+	}
+
+	secret := r.URL.Query().Get("secret")
+	if secret != webhookSecret {
+		log.Fatal(fmt.Errorf("invalid secret"))
+		return
+	}
+
+	bot, err := t.Bot()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -97,7 +111,7 @@ func (w *TgVercel) HandleWebhook(r *http.Request, onUpdate UpdateHandlerFunc) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	onUpdate(w.bot, update)
+	onUpdate(t.bot, update)
 }
 
 func (t *TgVercel) HandleSetup(w http.ResponseWriter, r *http.Request) {
@@ -115,13 +129,19 @@ func (t *TgVercel) HandleSetup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	webhookSecret := os.Getenv(o.TelegramWebhookSecretEnvName)
+	if webhookSecret == "" {
+		errorResponse(w, fmt.Errorf("%s is not set", o.TelegramWebhookSecretEnvName))
+		return
+	}
+
 	key := r.URL.Query().Get(o.KeyParamName)
 	if key != tgBotServiceKey {
 		unauthorizedResponse(w, fmt.Errorf("invalid key"))
 		return
 	}
 
-	webhookUri := fmt.Sprintf("https://%s%s", vercelUrl, o.WebhookRelativeUrl)
+	webhookUri := fmt.Sprintf("https://%s%s?secret=%s", vercelUrl, o.WebhookRelativeUrl, webhookSecret)
 
 	bot, err := t.Bot()
 	if err != nil {
