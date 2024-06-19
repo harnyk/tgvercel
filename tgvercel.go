@@ -123,9 +123,21 @@ func (t *TgVercel) HandleSetup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vercelUrl := os.Getenv(o.VercelUrlEnvName)
-	if vercelUrl == "" {
+	vercelEnv := os.Getenv(o.VercelEnvEnvName)
+	if vercelEnv == "" {
+		errorResponse(w, fmt.Errorf("%s is not set", o.VercelEnvEnvName))
+		return
+	}
+
+	vercelGeneratedDeploymentUrl := os.Getenv(o.VercelUrlEnvName)
+	if vercelGeneratedDeploymentUrl == "" {
 		errorResponse(w, fmt.Errorf("%s is not set", o.VercelUrlEnvName))
+		return
+	}
+
+	vercelProjectProductionUrl := os.Getenv(o.VercelProjectProductionUrlEnvName)
+	if vercelProjectProductionUrl == "" {
+		errorResponse(w, fmt.Errorf("%s is not set", o.VercelProjectProductionUrlEnvName))
 		return
 	}
 
@@ -141,7 +153,16 @@ func (t *TgVercel) HandleSetup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	webhookUri := fmt.Sprintf("https://%s%s?secret=%s", vercelUrl, o.WebhookRelativeUrl, webhookSecret)
+	domain := vercelGeneratedDeploymentUrl
+	if vercelEnv == "production" {
+		domain = vercelProjectProductionUrl
+	}
+
+	webhookUri := fmt.Sprintf("https://%s%s?secret=%s",
+		domain,
+		o.WebhookRelativeUrl,
+		webhookSecret,
+	)
 
 	bot, err := t.Bot()
 	if err != nil {
