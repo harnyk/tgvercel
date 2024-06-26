@@ -1,4 +1,4 @@
-module github.com/harnyk/tgvercel
+module github.com/harnyk/tgvercel/fn
 
 go 1.20
 

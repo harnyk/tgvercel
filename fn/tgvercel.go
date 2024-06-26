@@ -1,4 +1,4 @@
-package tgvercel
+package fn
 
 import (
 	"encoding/json"
