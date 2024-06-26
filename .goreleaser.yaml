@@ -15,6 +15,9 @@ version: 2
 # you may remove this if you don't need go generate
 # - go generate ./...
 
+gomod:
+  dir: ./cli
+
 builds:
   - env:
       - CGO_ENABLED=0
