@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/google/uuid"
-	"github.com/harnyk/tgvercel/cli/internal/vapi"
-	"github.com/harnyk/tgvercel/cli/internal/vconfig"
+	"github.com/harnyk/tgvercel/internal/vapi"
+	"github.com/harnyk/tgvercel/internal/vconfig"
 )
 
 type CmdInitOptions struct {

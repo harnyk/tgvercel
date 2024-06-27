@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/harnyk/tgvercel/cli/internal/vapi"
+	"github.com/harnyk/tgvercel/internal/vapi"
 )
 
 type CmdHookOptions struct {

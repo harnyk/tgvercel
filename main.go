@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/harnyk/tgvercel/cli/internal/commands"
+	"github.com/harnyk/tgvercel/internal/commands"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

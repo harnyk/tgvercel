@@ -1,4 +1,4 @@
-module github.com/harnyk/tgvercel/cli
+module github.com/harnyk/tgvercel
 
 go 1.20
 
