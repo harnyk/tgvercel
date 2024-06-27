@@ -136,27 +136,24 @@ func (c *Client) getEnvDescriptor(projectID, key string, target Target) (*EnvDes
 	}
 
 	var envDescriptor *EnvDescriptor
+	seenWithNonMatchingTarget := false
 	for _, env := range envs.Envs {
 		if env.Key == key {
-			envDescriptor = &env
-			break
+			if env.MatchTarget(target) {
+				envDescriptor = &env
+				break
+			} else {
+				seenWithNonMatchingTarget = true
+			}
 		}
 	}
 
 	if envDescriptor == nil {
+		if seenWithNonMatchingTarget {
+			return nil, fmt.Errorf("env %s not found in target %s", key, target)
+		}
 		return nil, fmt.Errorf("env %s not found", key)
 	}
 
-	targets := envDescriptor.Target
-	if len(targets) == 0 {
-		return nil, fmt.Errorf("env %s has no target", key)
-	}
-
-	for _, envTarget := range targets {
-		if envTarget == target {
-			return envDescriptor, nil
-		}
-	}
-
-	return nil, fmt.Errorf("env %s not found in target %s", key, target)
+	return envDescriptor, nil
 }

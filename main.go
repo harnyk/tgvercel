@@ -1,10 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/harnyk/tgvercel/internal/commands"
+	"github.com/harnyk/tgvercel/internal/helpers"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -25,7 +27,7 @@ var initCmd = &cobra.Command{
 		telegramWebhookSecret := viper.GetString("telegram-webhook-secret")
 
 		if telegramToken == "" {
-			fmt.Println("Error: --telegram-token or TELEGRAM_TOKEN environment variable is required")
+			log.Println(color.RedString("Error: --telegram-token or TELEGRAM_TOKEN environment variable is required"))
 			cmd.Help()
 			os.Exit(1)
 		}
@@ -36,16 +38,16 @@ var initCmd = &cobra.Command{
 		}
 
 		// Implement the logic for setting environment variables in Vercel project here
-		fmt.Println("Initializing Vercel project with the following settings:")
-		fmt.Printf("Target: %s\n", target)
-		fmt.Printf("Telegram Token: %s\n", telegramToken)
+		log.Println("Initializing Vercel project with the following settings:")
+		log.Printf("Target: %s\n", target)
+		log.Printf("Telegram Token: %s\n", telegramToken)
 		if vercelToken != "" {
-			fmt.Printf("Vercel Token: %s\n", vercelToken)
+			log.Printf("Vercel Token: %s\n", vercelToken)
 		}
 		if telegramWebhookSecret != "" {
-			fmt.Printf("Telegram Webhook Secret: %s\n", telegramWebhookSecret)
+			log.Printf("Telegram Webhook Secret: %s\n", telegramWebhookSecret)
 		} else {
-			fmt.Println("Telegram Webhook Secret will be generated randomly")
+			log.Println("Telegram Webhook Secret will be generated randomly")
 		}
 
 		command := commands.NewCmdInit(commands.CmdInitOptions{
@@ -69,13 +71,13 @@ var setupWebhookCmd = &cobra.Command{
 		vercelToken := viper.GetString("token")
 
 		// Implement the logic for setting up the Telegram webhook here
-		fmt.Println("Setting up Telegram webhook with the following settings:")
-		fmt.Printf("Deployment ID or URL: %s\n", deploymentIdOrUrl)
-		fmt.Printf("Telegram Bot Route: %s\n", telegramBotRoute)
+		log.Println("Setting up Telegram webhook with the following settings:")
+		log.Printf("Deployment ID or URL: %s\n", deploymentIdOrUrl)
+		log.Printf("Telegram Bot Route: %s\n", telegramBotRoute)
 		if vercelToken != "" {
-			fmt.Printf("Vercel Token: %s\n", vercelToken)
+			log.Printf("Vercel Token: %s\n", helpers.Redact(vercelToken, 5))
 		} else {
-			fmt.Println("Vercel Token will be taken from the file")
+			log.Println("Vercel Token will be taken from the file")
 		}
 
 		command := commands.NewCmdHook(commands.CmdHookOptions{
@@ -114,8 +116,10 @@ func initConfig() {
 }
 
 func main() {
+	log.Println(banner)
+
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		log.Println(color.RedString(err.Error()))
 		os.Exit(1)
 	}
 }

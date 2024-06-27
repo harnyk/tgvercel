@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/harnyk/tgvercel/internal/helpers"
 	"github.com/harnyk/tgvercel/internal/vapi"
 	"github.com/harnyk/tgvercel/internal/vconfig"
 )
@@ -65,22 +66,23 @@ func (c *CmdHook) Execute() error {
 		return err
 	}
 
-	log.Printf("Telegram Webhook secret: %s", envTelegramSecret)
-	log.Printf("Telegram Webhook token:  %s", envTelegramToken)
+	log.Printf("Telegram Webhook Secret: %s", helpers.Redact(envTelegramSecret, 3))
+	log.Printf("Telegram Token:          %s", helpers.Redact(envTelegramToken, 3))
 	log.Printf("Deployment Domain:       %s", deploymentDomain)
 	log.Printf("Bot Route:               %s", c.Options.TelegramBotRoute)
 	log.Printf("Target:                  %s", deploymentTarget)
 
-	webhookUrlQuery := url.Values{}
-	webhookUrlQuery.Set("secret", envTelegramSecret)
 	webhookUrl := url.URL{
-		Scheme:   "https",
-		Host:     deploymentDomain,
-		Path:     c.Options.TelegramBotRoute,
-		RawQuery: webhookUrlQuery.Encode(),
+		Scheme: "https",
+		Host:   deploymentDomain,
+		Path:   c.Options.TelegramBotRoute,
 	}
 
-	log.Printf("Telegram Webhook URL:    %s", webhookUrl.String())
+	log.Printf("Telegram Webhook URL (secret skipped): %s", webhookUrl.String())
+
+	webhookUrlQuery := url.Values{}
+	webhookUrlQuery.Set("secret", envTelegramSecret)
+	webhookUrl.RawQuery = webhookUrlQuery.Encode()
 
 	bot, err := tgbotapi.NewBotAPI(envTelegramToken)
 	if err != nil {
