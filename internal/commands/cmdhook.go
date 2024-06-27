@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/harnyk/tgvercel/internal/vapi"
+	"github.com/harnyk/tgvercel/internal/vconfig"
 )
 
 type CmdHookOptions struct {
@@ -26,11 +28,26 @@ func NewCmdHook(options CmdHookOptions) *CmdHook {
 }
 
 func (c *CmdHook) Execute() error {
+	localConfig := vconfig.NewConfig()
+
+	token := c.Options.VercelToken
+	if token == "" {
+		localToken, err := localConfig.GetAuthToken()
+		if err != nil {
+			return err
+		}
+		token = localToken
+	}
+
 	client := vapi.NewClientWithOptions(vapi.Options{
-		Token: c.Options.VercelToken,
+		Token: token,
 	})
 
-	deployment, err := client.GetDeployment(c.Options.DeploymentIDOrURL)
+	deploymentIdOrUrl := c.Options.DeploymentIDOrURL
+	deploymentIdOrUrl = strings.TrimPrefix(deploymentIdOrUrl, "https://")
+	deploymentIdOrUrl = strings.TrimPrefix(deploymentIdOrUrl, "http://")
+
+	deployment, err := client.GetDeployment(deploymentIdOrUrl)
 	if err != nil {
 		return err
 	}
