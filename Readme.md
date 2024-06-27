@@ -77,6 +77,7 @@ import (
 	"net/http"
 
 	"github.com/harnyk/tgvercelbot"
+    tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 var tgv = tgvercelbot.New(tgvercelbot.DefaultOptions())
