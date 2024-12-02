@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"runtime"
 )
 
 const (
 	authFileName        = ".local/share/com.vercel.cli/auth.json"
 	projectJSONFileName = "./.vercel/project.json"
+	windowsAuthFilePath = "com.vercel.cli\\Data\\auth.json"
 )
 
 type authJSON struct {
@@ -48,11 +50,19 @@ func (l *Config) GetProjectId() (string, error) {
 }
 
 func getFullAuthFileName() (string, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("failed to get user home directory: %v", err)
+	if runtime.GOOS == "windows" {
+		appData, err := os.UserConfigDir()
+		if err != nil {
+			return "", fmt.Errorf("failed to get APPDATA directory: %v", err)
+		}
+		return path.Join(appData, windowsAuthFilePath), nil
+	} else {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", fmt.Errorf("failed to get user home directory: %v", err)
+		}
+		return path.Join(home, authFileName), nil
 	}
-	return path.Join(home, authFileName), nil
 }
 
 func readJsonFromFile[T any](fileName string) (T, error) {
